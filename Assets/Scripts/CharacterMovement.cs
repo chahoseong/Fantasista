@@ -3,14 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace Fantasista.CharacterSystem
+namespace Fantasista.Character.Systems
 {
     public class CharacterMovement : MonoBehaviour
     {
-        [SerializeField] private Animator animator;
-        [SerializeField] private NavMeshAgent agent;
+        private Animator animator;
+        private NavMeshAgent agent;
 
-        private static readonly int ForwardSpeed = Animator.StringToHash("ForwardSpeed");
+        private static class AnimatorParameters
+        {
+            public static readonly int Speed = Animator.StringToHash("Speed");
+        }
+
+        private void Awake()
+        {
+            animator = GetComponent<Animator>();
+            agent = GetComponent<NavMeshAgent>();
+        }
 
         private void Start()
         {
@@ -24,25 +33,11 @@ namespace Fantasista.CharacterSystem
 
         private void Update()
         {
-            if (Input.GetMouseButton(0))
-            {
-                var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                if (Physics.Raycast(ray, out var hit))
-                {
-                    MoveTo(hit.point);
-                }
-            }
-
             if (agent.pathPending)
                 return;
 
-            if (agent.remainingDistance <= 1.0f)
-            {
-                //Debug.Log($"Remaining Distance: {agent.remainingDistance}");
-            }
-
             var speed = agent.desiredVelocity.magnitude;
-            animator.SetFloat(ForwardSpeed, speed, 0.175f, Time.deltaTime);
+            animator.SetFloat(AnimatorParameters.Speed, speed, 0.175f, Time.deltaTime);
         }
 
         public void MoveTo(Vector3 destination)
